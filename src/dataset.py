@@ -54,11 +54,11 @@ class UnpairedDataset(torch.utils.data.Dataset):
             raise FileNotFoundError(f"{dataset_folder} 下的 {split}A/{split}B 目录没有图像")
 
         with open(os.path.join(dataset_folder, "fixed_prompt.txt"), encoding="utf-8") as file:
-            self.fixed_caption_src = file.read().strip()
+            self.fixed_caption = file.read().strip()
 
         self.tokenizer = tokenizer
         self.transform = build_transform(image_prep)
-        self.input_ids_src = self._tokenize(self.fixed_caption_src)
+        self.input_ids_src = self._tokenize(self.fixed_caption)
 
     def _tokenize(self, caption):
         """把提示词编码为 (1, 77) 的 token id。"""
@@ -84,7 +84,6 @@ class UnpairedDataset(torch.utils.data.Dataset):
         return {
             "pixel_values_src": TF.normalize(source, mean=[0.5], std=[0.5]),
             "pixel_values_tgt": TF.normalize(target, mean=[0.5], std=[0.5]),
-            "caption_src": self.fixed_caption_src,
+            "caption_src": self.fixed_caption,
             "input_ids_src": self.input_ids_src,
-            "input_ids_tgt": self.input_ids_tgt,
         }
